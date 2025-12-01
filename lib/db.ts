@@ -94,16 +94,33 @@ export async function setupDatabase(): Promise<void> {
 
 // People queries
 export async function getPeople(): Promise<Person[]> {
-  const { rows } = await sql`
-    SELECT
-      p.id,
-      p.name,
-      (SELECT COUNT(*)::int FROM topics t WHERE t.person_id = p.id AND (t.discussed = FALSE OR t.discussed IS NULL)) as topic_count,
-      (SELECT COUNT(*)::int FROM topics t WHERE t.person_id = p.id AND t.discussed = TRUE) as discussed_count
-    FROM people p
-    ORDER BY p.name
+  // First get raw topic counts to debug
+  const { rows: topicCounts } = await sql`
+    SELECT person_id, COUNT(*)::int as cnt
+    FROM topics
+    WHERE discussed = FALSE OR discussed IS NULL
+    GROUP BY person_id
   `;
-  return rows as Person[];
+  const countMap = new Map(topicCounts.map((r: any) => [r.person_id, r.cnt]));
+
+  const { rows: discussedCounts } = await sql`
+    SELECT person_id, COUNT(*)::int as cnt
+    FROM topics
+    WHERE discussed = TRUE
+    GROUP BY person_id
+  `;
+  const discussedMap = new Map(discussedCounts.map((r: any) => [r.person_id, r.cnt]));
+
+  const { rows: people } = await sql`
+    SELECT id, name FROM people ORDER BY name
+  `;
+
+  return people.map((p: any) => ({
+    id: p.id,
+    name: p.name,
+    topic_count: countMap.get(p.id) || 0,
+    discussed_count: discussedMap.get(p.id) || 0
+  })) as Person[];
 }
 
 export async function getPersonByName(name: string): Promise<Person | null> {
