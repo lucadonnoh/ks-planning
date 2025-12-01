@@ -98,8 +98,8 @@ export async function getPeople(): Promise<Person[]> {
     SELECT
       p.id,
       p.name,
-      (SELECT COUNT(*)::int FROM topics t WHERE t.person_id = p.id AND (t.discussed = false OR t.discussed IS NULL)) as topic_count,
-      (SELECT COUNT(*)::int FROM topics t WHERE t.person_id = p.id AND t.discussed = true) as discussed_count
+      (SELECT COUNT(*)::int FROM topics t WHERE t.person_id = p.id AND (t.discussed = FALSE OR t.discussed IS NULL)) as topic_count,
+      (SELECT COUNT(*)::int FROM topics t WHERE t.person_id = p.id AND t.discussed = TRUE) as discussed_count
     FROM people p
     ORDER BY p.name
   `;
