@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTopics, createTopic, deleteTopic } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const userId = request.nextUrl.searchParams.get('userId');
     const topics = await getTopics(userId ? parseInt(userId) : undefined);
-    return NextResponse.json(topics);
+    return NextResponse.json(topics, {
+      headers: { 'Cache-Control': 'no-store, max-age=0' }
+    });
   } catch (error) {
     console.error('Error fetching topics:', error);
     return NextResponse.json({ error: 'Failed to fetch topics' }, { status: 500 });

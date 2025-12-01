@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSuggestions, createSuggestion } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const userId = request.nextUrl.searchParams.get('userId');
     const suggestions = await getSuggestions(userId ? parseInt(userId) : undefined);
-    return NextResponse.json(suggestions);
+    return NextResponse.json(suggestions, {
+      headers: { 'Cache-Control': 'no-store, max-age=0' }
+    });
   } catch (error) {
     console.error('Error fetching suggestions:', error);
     return NextResponse.json({ error: 'Failed to fetch suggestions' }, { status: 500 });
