@@ -98,8 +98,8 @@ export async function getPeople(): Promise<Person[]> {
     SELECT
       p.id,
       p.name,
-      COUNT(CASE WHEN t.id IS NOT NULL AND (t.discussed = FALSE OR t.discussed IS NULL) THEN 1 END)::int as topic_count,
-      COUNT(CASE WHEN t.discussed = TRUE THEN 1 END)::int as discussed_count
+      COUNT(CASE WHEN t.id IS NOT NULL AND COALESCE(t.discussed, FALSE) = FALSE THEN 1 END)::int as topic_count,
+      COUNT(CASE WHEN t.id IS NOT NULL AND t.discussed = TRUE THEN 1 END)::int as discussed_count
     FROM people p
     LEFT JOIN topics t ON t.person_id = p.id
     GROUP BY p.id, p.name
