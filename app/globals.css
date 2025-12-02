@@ -16,14 +16,14 @@
 }
 
 [data-theme="dark"] {
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #2d2d2d;
-  --bg-tertiary: #252525;
-  --text-primary: #e0e0e0;
-  --text-secondary: #b0b0b0;
-  --text-muted: #808080;
-  --border-color: #404040;
-  --border-hover: #606060;
+  --bg-primary: #121212;
+  --bg-secondary: #1e1e1e;
+  --bg-tertiary: #2a2a2a;
+  --text-primary: #f5f5f5;
+  --text-secondary: #d0d0d0;
+  --text-muted: #a0a0a0;
+  --border-color: #3a3a3a;
+  --border-hover: #555;
 }
 
 body {
@@ -171,6 +171,26 @@ button.edit {
   font-size: 0.85rem;
 }
 
+[data-theme="dark"] button.vote {
+  background: #1a3a5c;
+  color: #90caf9;
+}
+
+[data-theme="dark"] button.vote.voted {
+  background: #1976d2;
+  color: white;
+}
+
+[data-theme="dark"] button.delete {
+  background: #3d1a1a;
+  color: #ef9a9a;
+}
+
+[data-theme="dark"] button.edit {
+  background: #1a3a5c;
+  color: #90caf9;
+}
+
 .edit-form {
   width: 100%;
 }
@@ -271,7 +291,8 @@ button.edit {
 }
 
 [data-theme="dark"] .current-user {
-  background: #1e3a5f;
+  background: #1a3a5c;
+  color: #e0f0ff;
 }
 
 /* Empty state */
@@ -328,15 +349,18 @@ button.edit {
 }
 
 [data-theme="dark"] .leaderboard-item:nth-child(1) {
-  background: #3d3500;
+  background: #2d2800;
+  border-left-color: #ffd700;
 }
 
 [data-theme="dark"] .leaderboard-item:nth-child(2) {
-  background: #333;
+  background: #2a2a2a;
+  border-left-color: #c0c0c0;
 }
 
 [data-theme="dark"] .leaderboard-item:nth-child(3) {
-  background: #3d2a15;
+  background: #2d2015;
+  border-left-color: #cd7f32;
 }
 
 .leaderboard-item:last-child {
@@ -418,6 +442,21 @@ button.claim.claimed {
   font-weight: 500;
 }
 
+[data-theme="dark"] button.claim {
+  background: #3d2a00;
+  color: #ffb74d;
+}
+
+[data-theme="dark"] button.claim.claimed {
+  background: #e65100;
+  color: white;
+}
+
+[data-theme="dark"] .claimed-badge {
+  background: #1a3d1a;
+  color: #81c784;
+}
+
 /* Past topics */
 .past-topics-list {
   list-style: none;
@@ -469,6 +508,11 @@ button.discussed {
 button.discussed.is-discussed {
   background: #4caf50;
   color: white;
+}
+
+[data-theme="dark"] button.discussed {
+  background: #1a3d1a;
+  color: #81c784;
 }
 
 /* Dark mode toggle */
