@@ -8,6 +8,7 @@ interface Person {
   id: number;
   name: string;
   topic_count: number;
+  last_login?: string | null;
 }
 
 interface Topic {
@@ -52,6 +53,7 @@ export default function Dashboard() {
   const [editingTopicId, setEditingTopicId] = useState<number | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [editDesc, setEditDesc] = useState('');
+  const [newTopicsSinceLogin, setNewTopicsSinceLogin] = useState<Topic[]>([]);
 
   useEffect(() => {
     async function load() {
@@ -79,6 +81,17 @@ export default function Dashboard() {
         setSuggestions(await suggestionsRes.json());
         const allDiscussed = await discussedRes.json();
         setMyDiscussedTopics(allDiscussed.filter((t: Topic) => t.person_id === user.id));
+
+        // Check for new topics since last login and update last login
+        const loginRes = await fetch(`/api/people/${user.id}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lastLogin: user.last_login })
+        });
+        const loginData = await loginRes.json();
+        if (loginData.newTopics && loginData.newTopics.length > 0) {
+          setNewTopicsSinceLogin(loginData.newTopics);
+        }
       } catch (e) {
         console.error('Error loading data:', e);
       }
@@ -277,6 +290,24 @@ export default function Dashboard() {
       <div className="current-user">
         Logged in as <strong>{currentUser.name}</strong>
       </div>
+
+      {/* NEW TOPICS SINCE LAST LOGIN */}
+      {newTopicsSinceLogin.length > 0 && (
+        <div className="new-topics-banner">
+          <div className="new-topics-header">
+            <strong>New topics since your last visit ({newTopicsSinceLogin.length})</strong>
+            <button onClick={() => setNewTopicsSinceLogin([])}>Dismiss</button>
+          </div>
+          <ul className="new-topics-list">
+            {newTopicsSinceLogin.map(topic => (
+              <li key={topic.id}>
+                <span className="new-topic-title">{topic.title}</span>
+                <span className="new-topic-author">by {topic.person_name}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* MY TOPICS SECTION */}
       <h2>My Topics</h2>

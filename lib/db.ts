@@ -7,6 +7,7 @@ export interface Person {
   name: string;
   topic_count?: number;
   discussed_count?: number;
+  last_login?: string | null;
 }
 
 export interface Topic {
@@ -39,8 +40,14 @@ export async function setupDatabase(): Promise<void> {
   await sql`
     CREATE TABLE IF NOT EXISTS people (
       id SERIAL PRIMARY KEY,
-      name VARCHAR(100) NOT NULL UNIQUE
+      name VARCHAR(100) NOT NULL UNIQUE,
+      last_login TIMESTAMP
     )
+  `;
+
+  // Add last_login column if it doesn't exist (migration)
+  await sql`
+    ALTER TABLE people ADD COLUMN IF NOT EXISTS last_login TIMESTAMP
   `;
 
   await sql`
@@ -114,23 +121,53 @@ export async function getPeople(): Promise<Person[]> {
   const discussedMap = new Map(discussedCounts.map((r: any) => [r.person_id, r.cnt]));
 
   const { rows: people } = await sql`
-    SELECT id, name FROM people ORDER BY name
+    SELECT id, name, last_login FROM people ORDER BY name
   `;
 
   return people.map((p: any) => ({
     id: p.id,
     name: p.name,
     topic_count: countMap.get(p.id) || 0,
-    discussed_count: discussedMap.get(p.id) || 0
+    discussed_count: discussedMap.get(p.id) || 0,
+    last_login: p.last_login
   })) as Person[];
 }
 
 export async function getPersonByName(name: string): Promise<Person | null> {
   noStore();
   const { rows } = await sql`
-    SELECT id, name FROM people WHERE LOWER(name) = LOWER(${name})
+    SELECT id, name, last_login FROM people WHERE LOWER(name) = LOWER(${name})
   `;
   return rows[0] as Person || null;
+}
+
+export async function updateLastLogin(personId: number): Promise<string | null> {
+  const { rows } = await sql`
+    UPDATE people
+    SET last_login = NOW()
+    WHERE id = ${personId}
+    RETURNING last_login
+  `;
+  return rows[0]?.last_login || null;
+}
+
+export async function getTopicsSince(since: string | null, excludePersonId: number): Promise<Topic[]> {
+  noStore();
+  if (!since) {
+    return [];
+  }
+  const { rows } = await sql`
+    SELECT
+      t.id, t.person_id, t.title, t.description, t.created_at, t.discussed,
+      p.name as person_name
+    FROM topics t
+    JOIN people p ON p.id = t.person_id
+    WHERE t.created_at > ${since}
+      AND t.person_id != ${excludePersonId}
+      AND (t.discussed = FALSE OR t.discussed IS NULL)
+    ORDER BY t.created_at DESC
+  `;
+  return rows as Topic[];
 }
 
 // Topic queries
