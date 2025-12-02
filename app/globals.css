@@ -139,6 +139,27 @@ button.delete {
   font-size: 0.85rem;
 }
 
+button.edit {
+  background: #e3f2fd;
+  color: #1565c0;
+  padding: 5px 10px;
+  font-size: 0.85rem;
+}
+
+.edit-form {
+  width: 100%;
+}
+
+.edit-form input,
+.edit-form textarea {
+  margin-bottom: 8px;
+}
+
+.edit-form .actions {
+  display: flex;
+  gap: 8px;
+}
+
 /* Topic/Suggestion lists */
 .topic-list, .suggestion-list {
   list-style: none;

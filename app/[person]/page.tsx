@@ -49,6 +49,9 @@ export default function Dashboard() {
   const [newTopicDesc, setNewTopicDesc] = useState('');
   const [newSuggestionTitle, setNewSuggestionTitle] = useState('');
   const [newSuggestionDesc, setNewSuggestionDesc] = useState('');
+  const [editingTopicId, setEditingTopicId] = useState<number | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDesc, setEditDesc] = useState('');
 
   useEffect(() => {
     async function load() {
@@ -133,6 +136,36 @@ export default function Dashboard() {
       body: JSON.stringify({ topicId, personId: currentUser.id })
     });
 
+    refreshData();
+  }
+
+  function startEditTopic(topic: Topic) {
+    setEditingTopicId(topic.id);
+    setEditTitle(topic.title);
+    setEditDesc(topic.description || '');
+  }
+
+  function cancelEdit() {
+    setEditingTopicId(null);
+    setEditTitle('');
+    setEditDesc('');
+  }
+
+  async function saveEditTopic(topicId: number) {
+    if (!currentUser || !editTitle.trim()) return;
+
+    await fetch('/api/topics', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        topicId,
+        personId: currentUser.id,
+        title: editTitle.trim(),
+        description: editDesc.trim() || null
+      })
+    });
+
+    cancelEdit();
     refreshData();
   }
 
@@ -288,26 +321,52 @@ export default function Dashboard() {
         <ul className="topic-list">
           {myTopics.map(topic => (
             <li key={topic.id} className="topic-item">
-              <div className="content">
-                <div className="title">{topic.title}</div>
-                {topic.description && (
-                  <div className="description">{topic.description}</div>
-                )}
-                <div className="meta">{topic.vote_count} interested</div>
-              </div>
-              <div className="actions">
-                {isAdmin && (
-                  <button
-                    className="discussed"
-                    onClick={() => markAsDiscussed(topic.id, true)}
-                  >
-                    ✓ Done
-                  </button>
-                )}
-                <button className="delete" onClick={() => deleteTopic(topic.id)}>
-                  Delete
-                </button>
-              </div>
+              {editingTopicId === topic.id ? (
+                <div className="edit-form">
+                  <input
+                    type="text"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    placeholder="Topic title"
+                  />
+                  <textarea
+                    value={editDesc}
+                    onChange={(e) => setEditDesc(e.target.value)}
+                    placeholder="Description (optional)"
+                    rows={2}
+                  />
+                  <div className="actions">
+                    <button onClick={() => saveEditTopic(topic.id)}>Save</button>
+                    <button className="secondary" onClick={cancelEdit}>Cancel</button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="content">
+                    <div className="title">{topic.title}</div>
+                    {topic.description && (
+                      <div className="description">{topic.description}</div>
+                    )}
+                    <div className="meta">{topic.vote_count} interested</div>
+                  </div>
+                  <div className="actions">
+                    {isAdmin && (
+                      <button
+                        className="discussed"
+                        onClick={() => markAsDiscussed(topic.id, true)}
+                      >
+                        ✓ Done
+                      </button>
+                    )}
+                    <button className="edit" onClick={() => startEditTopic(topic)}>
+                      Edit
+                    </button>
+                    <button className="delete" onClick={() => deleteTopic(topic.id)}>
+                      Delete
+                    </button>
+                  </div>
+                </>
+              )}
             </li>
           ))}
         </ul>

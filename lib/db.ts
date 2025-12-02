@@ -208,6 +208,14 @@ export async function deleteTopic(topicId: number, personId: number): Promise<bo
   return (rowCount ?? 0) > 0;
 }
 
+export async function updateTopic(topicId: number, personId: number, title: string, description: string | null): Promise<boolean> {
+  const { rowCount } = await sql`
+    UPDATE topics SET title = ${title}, description = ${description}
+    WHERE id = ${topicId} AND person_id = ${personId}
+  `;
+  return (rowCount ?? 0) > 0;
+}
+
 export async function toggleTopicVote(topicId: number, voterId: number): Promise<boolean> {
   const { rows } = await sql`
     SELECT id FROM topic_votes WHERE topic_id = ${topicId} AND voter_id = ${voterId}

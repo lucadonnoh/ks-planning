@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getTopics, createTopic, deleteTopic } from '@/lib/db';
+import { getTopics, createTopic, deleteTopic, updateTopic } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,5 +45,21 @@ export async function DELETE(request: NextRequest) {
   } catch (error) {
     console.error('Error deleting topic:', error);
     return NextResponse.json({ error: 'Failed to delete topic' }, { status: 500 });
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    const { topicId, personId, title, description } = await request.json();
+
+    if (!topicId || !personId || !title) {
+      return NextResponse.json({ error: 'topicId, personId and title are required' }, { status: 400 });
+    }
+
+    const updated = await updateTopic(topicId, personId, title, description || null);
+    return NextResponse.json({ success: updated });
+  } catch (error) {
+    console.error('Error updating topic:', error);
+    return NextResponse.json({ error: 'Failed to update topic' }, { status: 500 });
   }
 }
