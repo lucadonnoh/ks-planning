@@ -1,5 +1,6 @@
 import './globals.css'
 import { Metadata } from 'next'
+import ThemeToggle from './components/ThemeToggle'
 
 export const metadata: Metadata = {
   title: 'Knowledge Sharing Planner',
@@ -13,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ThemeToggle />
+        {children}
+      </body>
     </html>
   )
 }
