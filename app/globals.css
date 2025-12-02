@@ -89,6 +89,11 @@ h2 {
 .badge.green { background: #e8f5e9; color: #2e7d32; }
 .badge.blue { background: #e3f2fd; color: #1565c0; }
 
+[data-theme="dark"] .badge.red { background: #3d1a1a; color: #f48fb1; }
+[data-theme="dark"] .badge.orange { background: #3d2a00; color: #ffcc80; }
+[data-theme="dark"] .badge.green { background: #1a3d1a; color: #a5d6a7; }
+[data-theme="dark"] .badge.blue { background: #1a3a5c; color: #90caf9; }
+
 /* Progress bar */
 .progress-container {
   background: #eee;
@@ -96,6 +101,10 @@ h2 {
   height: 8px;
   margin: 10px 0;
   overflow: hidden;
+}
+
+[data-theme="dark"] .progress-container {
+  background: #333;
 }
 
 .progress-bar {
