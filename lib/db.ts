@@ -1,4 +1,5 @@
 import { sql } from '@vercel/postgres';
+import { unstable_noStore as noStore } from 'next/cache';
 
 // Types
 export interface Person {
@@ -94,6 +95,7 @@ export async function setupDatabase(): Promise<void> {
 
 // People queries
 export async function getPeople(): Promise<Person[]> {
+  noStore();
   // First get raw topic counts to debug
   const { rows: topicCounts } = await sql`
     SELECT person_id, COUNT(*)::int as cnt
@@ -124,6 +126,7 @@ export async function getPeople(): Promise<Person[]> {
 }
 
 export async function getPersonByName(name: string): Promise<Person | null> {
+  noStore();
   const { rows } = await sql`
     SELECT id, name FROM people WHERE LOWER(name) = LOWER(${name})
   `;
@@ -132,6 +135,7 @@ export async function getPersonByName(name: string): Promise<Person | null> {
 
 // Topic queries
 export async function getTopics(currentUserId?: number): Promise<Topic[]> {
+  noStore();
   const userId = currentUserId || 0;
   const { rows } = await sql`
     SELECT
@@ -152,6 +156,7 @@ export async function getTopics(currentUserId?: number): Promise<Topic[]> {
 }
 
 export async function getDiscussedTopics(): Promise<Topic[]> {
+  noStore();
   const { rows } = await sql`
     SELECT
       t.id, t.person_id, t.title, t.description, t.created_at, t.discussed,
@@ -219,6 +224,7 @@ export async function toggleTopicVote(topicId: number, voterId: number): Promise
 
 // Suggestion queries
 export async function getSuggestions(currentUserId?: number): Promise<Suggestion[]> {
+  noStore();
   const userId = currentUserId || 0;
   const { rows } = await sql`
     SELECT
