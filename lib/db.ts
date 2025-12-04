@@ -93,7 +93,7 @@ export async function setupDatabase(): Promise<void> {
   `;
 
   // Seed people
-  const people = ['Piotr', 'Hubert', 'Adrian', 'Luca', 'Vincenzo', 'Antoni', 'Jan', 'Tomasz', 'Maciek', 'Matt', 'Konrad', 'Michal', 'Basti', 'Manu', 'Sergey', 'Peter', 'Bartek', 'Adi'];
+  const people = ['Piotr', 'Hubert', 'Adrian', 'Luca', 'Vincenzo', 'Antoni', 'Jan', 'Tomasz', 'Maciek', 'Matt', 'Konrad', 'Michal', 'Basti', 'Manu', 'Sergey', 'Peter', 'Bartek', 'Adi', 'Kris'];
 
   for (const name of people) {
     await sql`INSERT INTO people (name) VALUES (${name}) ON CONFLICT (name) DO NOTHING`;
