@@ -301,8 +301,25 @@ export default function Dashboard() {
           <ul className="new-topics-list">
             {newTopicsSinceLogin.map(topic => (
               <li key={topic.id}>
-                <span className="new-topic-title">{topic.title}</span>
-                <span className="new-topic-author">by {topic.person_name}</span>
+                <div className="new-topic-info">
+                  <span className="new-topic-title">{topic.title}</span>
+                  <span className="new-topic-author">by {topic.person_name}</span>
+                </div>
+                <button
+                  className={`vote ${topic.voted_by_current_user ? 'voted' : ''}`}
+                  onClick={async () => {
+                    await voteOnTopic(topic.id);
+                    setNewTopicsSinceLogin(prev =>
+                      prev.map(t =>
+                        t.id === topic.id
+                          ? { ...t, voted_by_current_user: !t.voted_by_current_user }
+                          : t
+                      )
+                    );
+                  }}
+                >
+                  {topic.voted_by_current_user ? '★ Interested' : '☆ Interested'}
+                </button>
               </li>
             ))}
           </ul>

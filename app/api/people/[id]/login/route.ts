@@ -12,7 +12,7 @@ export async function POST(
     const { lastLogin } = await request.json();
 
     // Get new topics since last login
-    const newTopics = await getTopicsSince(lastLogin, personId);
+    const newTopics = await getTopicsSince(lastLogin, personId, personId);
 
     // Update last login to now
     const newLastLogin = await updateLastLogin(personId);

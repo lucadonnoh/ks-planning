@@ -151,7 +151,7 @@ export async function updateLastLogin(personId: number): Promise<string | null> 
   return rows[0]?.last_login || null;
 }
 
-export async function getTopicsSince(since: string | null, excludePersonId: number): Promise<Topic[]> {
+export async function getTopicsSince(since: string | null, excludePersonId: number, currentUserId: number): Promise<Topic[]> {
   noStore();
   if (!since) {
     return [];
@@ -159,7 +159,10 @@ export async function getTopicsSince(since: string | null, excludePersonId: numb
   const { rows } = await sql`
     SELECT
       t.id, t.person_id, t.title, t.description, t.created_at, t.discussed,
-      p.name as person_name
+      p.name as person_name,
+      CASE WHEN EXISTS(
+        SELECT 1 FROM topic_votes WHERE topic_id = t.id AND voter_id = ${currentUserId}
+      ) THEN true ELSE false END as voted_by_current_user
     FROM topics t
     JOIN people p ON p.id = t.person_id
     WHERE t.created_at > ${since}
